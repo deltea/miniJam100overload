@@ -1,4 +1,4 @@
-# **Game**
+# **The Tipping Point**
 
 A mini-game made for **Mini Jam *#100: Overload***
 
