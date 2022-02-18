@@ -22,7 +22,7 @@ class Game extends Phaser.Scene {
     game.virusInterval = this.time.addEvent({
       delay: 3000,
       callback: () => {
-        let virus = game.viruses.create(game.player.x, game.player.y, "virus").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
+        let virus = game.viruses.create(game.player.x, game.player.y, "virus").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(250);
         this.physics.velocityFromAngle(Math.random() * 360, 200, virus.body.velocity);
       },
       callbackScope: this,
@@ -31,7 +31,9 @@ class Game extends Phaser.Scene {
 
     // ---------- Colliders ----------
     this.physics.add.collider(game.viruses, game.viruses);
-    this.physics.add.collider(game.player, game.viruses);
+    this.physics.add.collider(game.player, game.viruses, () => {
+      console.log("Die");
+    });
   }
   update() {
     // Player movement
