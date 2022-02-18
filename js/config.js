@@ -18,6 +18,6 @@ const config = {
       // debug: true
     }
   },
-  scene: [Game]
+  scene: [Round1, GameOver]
 };
 const phaserGame = new Phaser.Game(config);
