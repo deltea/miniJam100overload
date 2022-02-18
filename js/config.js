@@ -7,7 +7,7 @@ const config = {
   render: {
     pixelArt: true
   },
-  backgroundColor: 0x000000,
+  backgroundColor: 0xffffff,
   physics: {
     default: "arcade",
     arcade: {
@@ -18,6 +18,6 @@ const config = {
       // debug: true
     }
   },
-  scene: [Round1, GameOver]
+  scene: [Round1, Round2, Round3, Round4, GameOver]
 };
 const phaserGame = new Phaser.Game(config);
