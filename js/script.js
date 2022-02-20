@@ -185,7 +185,7 @@ class Game extends Phaser.Scene {
     // Virus actions
     game.virusBullet = this.physics.add.group();
     this.time.addEvent({
-      delay: 2500,
+      delay: 8000,
       callback: () => {
         game.viruses.getChildren().forEach(virus => {
           if (virus.type === "duplicationVirus") {
@@ -318,6 +318,9 @@ class GameOver extends Phaser.Scene {
     game.talk7 = this.sound.add("talk7").setLoop(true);
     game.talk7.play({rate: 2});
 
+    // Fade in to the scene
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
+
     // Scrolling background
     game.gameOverBackground1 = this.add.tileSprite(0, 0, game.engine.gameWidth, game.engine.gameHeight, "news1").setOrigin(0);
     game.gameOverBackground2 = this.add.tileSprite(0, 0, game.engine.gameWidth / 2, game.engine.gameHeight, "news2").setOrigin(0);
@@ -340,7 +343,10 @@ class GameOver extends Phaser.Scene {
       game.talk5.stop();
       game.talk6.stop();
       game.talk7.stop();
-      phaser.scene.start(`Cutscene${game.currentRound}`);
+      phaser.cameras.main.fadeOut(1000, 0, 0, 0);
+      phaser.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (camera, effect) => {
+        phaser.scene.start(`Cutscene${game.currentRound}`);
+      });
     });
   }
   update() {
@@ -361,6 +367,9 @@ class Win extends Phaser.Scene {
     this.load.image("peace", "assets/peace.png");
   }
   create() {
+    // Fade in to the scene
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
+
     // Text
     game.engine = new Engine(this);
     game.finallyText = this.add.image(game.engine.gameWidth / 2, game.engine.gameHeight / 2, "finally").setScale(8).setAlpha(0);
