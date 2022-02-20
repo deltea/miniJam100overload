@@ -66,6 +66,9 @@ class Game extends Phaser.Scene {
     game.sfx["talk6"] = this.sound.add("talk6").setLoop(true);
     game.sfx["talk7"] = this.sound.add("talk7").setLoop(true);
 
+    // Keyboard input
+    game.keyboard = this.input.keyboard.createCursorKeys();
+
     // Scrolling background
     game.background1 = this.add.tileSprite(0, 0, game.engine.gameWidth, game.engine.gameHeight, "news1").setOrigin(0);
     game.background2 = this.add.tileSprite(0, 0, game.engine.gameWidth / 2, game.engine.gameHeight, "news2").setOrigin(0);
@@ -196,7 +199,7 @@ class Game extends Phaser.Scene {
     // Virus actions
     game.virusBullet = this.physics.add.group();
     this.time.addEvent({
-      delay: 8000,
+      delay: 5000,
       callback: () => {
         game.viruses.getChildren().forEach(virus => {
           if (virus.type === "duplicationVirus") {
@@ -254,22 +257,22 @@ class Game extends Phaser.Scene {
   }
   update() {
     // Player movement
-    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A).isDown) {
+    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A).isDown || game.keyboard.left.isDown) {
       game.player.setVelocityX(-300);
       game.background1.tilePositionY += game.scrollAmount;
       game.background2.tilePositionY += game.scrollAmount;
     }
-    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D).isDown) {
+    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D).isDown || game.keyboard.right.isDown) {
       game.player.setVelocityX(300);
       game.background1.tilePositionY -= game.scrollAmount;
       game.background2.tilePositionY -= game.scrollAmount;
     }
-    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S).isDown) {
+    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S).isDown || game.keyboard.down.isDown) {
       game.player.setVelocityY(300);
       game.background1.tilePositionX += game.scrollAmount;
       game.background2.tilePositionX += game.scrollAmount;
     }
-    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).isDown) {
+    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).isDown || game.keyboard.up.isDown) {
       game.player.setVelocityY(-300);
       game.background1.tilePositionX -= game.scrollAmount;
       game.background2.tilePositionX -= game.scrollAmount;
