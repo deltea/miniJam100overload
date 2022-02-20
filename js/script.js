@@ -292,13 +292,20 @@ class GameOver extends Phaser.Scene {
   create() {
     let phaser = this;
     // Sound
-    this.sound.add("talk1").setLoop(true).play({rate: 2});
-    this.sound.add("talk2").setLoop(true).play({rate: 2});
-    this.sound.add("talk3").setLoop(true).play({rate: 2});
-    this.sound.add("talk4").setLoop(true).play({rate: 2});
-    this.sound.add("talk5").setLoop(true).play({rate: 2});
-    this.sound.add("talk6").setLoop(true).play({rate: 2});
-    this.sound.add("talk7").setLoop(true).play({rate: 2});
+    game.talk1 = this.sound.add("talk1").setLoop(true);
+    game.talk1.play({rate: 2});
+    game.talk2 = this.sound.add("talk2").setLoop(true);
+    game.talk2.play({rate: 2});
+    game.talk3 = this.sound.add("talk3").setLoop(true);
+    game.talk3.play({rate: 2});
+    game.talk4 = this.sound.add("talk4").setLoop(true);
+    game.talk4.play({rate: 2});
+    game.talk5 = this.sound.add("talk5").setLoop(true);
+    game.talk5.play({rate: 2});
+    game.talk6 = this.sound.add("talk6").setLoop(true);
+    game.talk6.play({rate: 2});
+    game.talk7 = this.sound.add("talk7").setLoop(true);
+    game.talk7.play({rate: 2});
 
     // Scrolling background
     game.gameOverBackground1 = this.add.tileSprite(0, 0, game.engine.gameWidth, game.engine.gameHeight, "news1").setOrigin(0);
@@ -315,6 +322,13 @@ class GameOver extends Phaser.Scene {
       yoyo: true
     });
     this.input.on("pointerdown", function () {
+      game.talk1.stop();
+      game.talk2.stop();
+      game.talk3.stop();
+      game.talk4.stop();
+      game.talk5.stop();
+      game.talk6.stop();
+      game.talk7.stop();
       phaser.scene.start(`Cutscene${game.currentRound}`);
     });
   }
