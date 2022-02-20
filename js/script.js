@@ -128,6 +128,7 @@ class Game extends Phaser.Scene {
         } else if (game.currentRound === 2) {
           let virus = game.viruses.create(pointer.x, pointer.y, "cannonVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1);
           virus.type = "cannonVirus";
+          virus.timer = 250;
           virus.anims.play("spawnCannonVirus");
           this.time.addEvent({
             delay: 800,
@@ -187,10 +188,7 @@ class Game extends Phaser.Scene {
       delay: 2500,
       callback: () => {
         game.viruses.getChildren().forEach(virus => {
-          if (virus.type === "cannonVirus") {
-            let bullet = game.virusBullet.create(virus.x, virus.y, "virusBullet").setScale(8).setGravityY(-1500).setSize(2, 2).setOffset(3, 3);
-            this.physics.velocityFromAngle(virus.angle, 500, bullet.body.velocity);
-          } else if (virus.type === "duplicationVirus") {
+          if (virus.type === "duplicationVirus") {
             virus = game.viruses.create(virus.x, virus.y, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(5).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
             virus.anims.play("spawnDuplicationVirus");
             virus.type = "duplicationVirus";
@@ -269,6 +267,19 @@ class Game extends Phaser.Scene {
     // Move cooldown indicator too
     game.cooldownIndicator.x = game.player.x + 5;
     game.cooldownIndicator.y = game.player.y - 45;
+
+    // Cannon virus action
+    game.viruses.getChildren().forEach(virus => {
+      if (virus.type === "cannonVirus") {
+        if (virus.timer > 0) {
+          virus.timer--;
+        } else {
+          let bullet = game.virusBullet.create(virus.x, virus.y, "virusBullet").setScale(8).setGravityY(-1500).setSize(2, 2).setOffset(3, 3);
+          this.physics.velocityFromAngle(virus.angle, 500, bullet.body.velocity);
+          virus.timer = 250;
+        }
+      }
+    });
   }
 }
 
