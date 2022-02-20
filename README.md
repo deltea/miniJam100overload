@@ -1,4 +1,4 @@
-# **COVID-19 Overload**
+# **Information Overload**
 
 A mini-game made for **Mini Jam *#100: Overload***
 

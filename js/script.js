@@ -90,8 +90,12 @@ class Game extends Phaser.Scene {
           game.sfx["talk5"].stop();
           game.sfx["talk6"].stop();
           game.sfx["talk7"].stop();
-          this.scene.start(`Cutscene${game.currentRound + 1}`);
-          game.currentRound++;
+          if (game.currentRound <= 3) {
+            this.scene.start(`Cutscene${game.currentRound + 1}`);
+            game.currentRound++;
+          } else {
+            this.scene.start("Win");
+          }
         }
         game.virusAmount++;
         game.scrollAmount = 0.5 * 1.3 ** game.scrollFactor;
@@ -274,6 +278,58 @@ class GameOver extends Phaser.Scene {
   }
   create() {
     this.cameras.main.backgroundColor.setTo(255, 255, 255);
+  }
+  update() {
+
+  }
+}
+
+// Win scene
+class Win extends Phaser.Scene {
+  constructor() {
+    super("Win");
+  }
+  preload() {
+    this.load.image("finally", "assets/finally.png");
+    this.load.image("peace", "assets/peace.png");
+  }
+  create() {
+    // Text
+    game.engine = new Engine(this);
+    game.finallyText = this.add.image(game.engine.gameWidth / 2, game.engine.gameHeight / 2, "finally").setScale(8).setAlpha(0);
+    game.peaceText = this.add.image(game.engine.gameWidth / 2, game.engine.gameHeight / 2, "peace").setScale(8).setAlpha(0);
+
+    // Fade in text
+    this.tweens.add({
+      targets: game.finallyText,
+      delay: 1000,
+      alpha: 1,
+      duration: 2000,
+      repeat: 0,
+      onComplete: () => {
+        this.tweens.add({
+          targets: game.finallyText,
+          alpha: 0,
+          duration: 2000,
+          repeat: 0
+        });
+        this.tweens.add({
+          targets: game.peaceText,
+          delay: 3000,
+          alpha: 1,
+          duration: 2000,
+          repeat: 0,
+          onComplete: () => {
+            this.tweens.add({
+              targets: game.peaceText,
+              alpha: 0,
+              duration: 2000,
+              repeat: 0
+            });
+          }
+        });
+      }
+    });
   }
   update() {
 
