@@ -50,7 +50,7 @@ class Game extends Phaser.Scene {
   create() {
     let phaser = this;
     game.virusAmount = 0;
-    game.virusCooldown = 0;
+    game.virusCooldown = 300;
     game.scrollAmount = 0;
     game.scrollFactor = 0;
 
@@ -75,8 +75,9 @@ class Game extends Phaser.Scene {
 
     // Spawn viruses
     game.viruses = this.physics.add.group();
-    this.input.on("pointerdown", (pointer) => {
-      if (game.virusCooldown <= 0) {
+    this.time.addEvent({
+      delay: 3000,
+      callback: () => {
         // Reset cooldown
         game.virusCooldown = 300;
         game.cooldownIndicator.width = 0;
@@ -113,7 +114,7 @@ class Game extends Phaser.Scene {
 
         // Create virus
         if (game.currentRound === 1) {
-          let virus = game.viruses.create(pointer.x, pointer.y, "virus1").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
+          let virus = game.viruses.create(Math.random() * game.engine.gameWidth, Math.random() * game.engine.gameHeight, "virus1").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
           virus.type = "virus1";
           virus.anims.play("spawnVirus1");
           this.time.addEvent({
@@ -126,7 +127,7 @@ class Game extends Phaser.Scene {
             repeat: 0
           });
         } else if (game.currentRound === 2) {
-          let virus = game.viruses.create(pointer.x, pointer.y, "cannonVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1);
+          let virus = game.viruses.create(Math.random() * game.engine.gameWidth, Math.random() * game.engine.gameHeight, "cannonVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1);
           virus.type = "cannonVirus";
           virus.timer = 250;
           virus.anims.play("spawnCannonVirus");
@@ -140,7 +141,7 @@ class Game extends Phaser.Scene {
             repeat: 0
           });
         } else if (game.currentRound === 3) {
-          let virus = game.viruses.create(pointer.x, pointer.y, "virus2").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
+          let virus = game.viruses.create(Math.random() * game.engine.gameWidth, Math.random() * game.engine.gameHeight, "virus2").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
           virus.type = "virus2";
           virus.anims.play("spawnVirus2");
           this.time.addEvent({
@@ -153,7 +154,7 @@ class Game extends Phaser.Scene {
             repeat: 0
           });
         } else if (game.currentRound === 4) {
-          let virus = game.viruses.create(pointer.x, pointer.y, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
+          let virus = game.viruses.create(Math.random() * game.engine.gameWidth, Math.random() * game.engine.gameHeight, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
           virus.type = "duplicationVirus";
           virus.anims.play("spawnDuplicationVirus");
           this.time.addEvent({
@@ -166,7 +167,9 @@ class Game extends Phaser.Scene {
             repeat: 0
           });
         }
-      }
+      },
+      callbackScope: this,
+      repeat: -1
     });
 
     // Virus cooldown
@@ -175,7 +178,7 @@ class Game extends Phaser.Scene {
       callback: () => {
         if (game.virusCooldown > 0) {
           game.virusCooldown--;
-          game.cooldownIndicator.width += 0.16;
+          game.cooldownIndicator.width += 0.32;
         }
       },
       callbackScope: this,
@@ -210,13 +213,13 @@ class Game extends Phaser.Scene {
     }
 
     // Show virus cooldown
-    game.cooldownIndicator = this.add.rectangle(game.player.x + 5, game.player.y - 45, 50, 10, 0xff1100);
+    game.cooldownIndicator = this.add.rectangle(game.player.x - 25, game.player.y - 45, 0, 10, 0xff1100);
 
     // ---------- Some animation ----------
-    game.engine.addAnimation("spawnVirus1", 10, false, false, "virus1-1", "virus1-2", "virus1-3", "virus1");
-    game.engine.addAnimation("spawnVirus2", 10, false, false, "virus2-1", "virus2-2", "virus2-3", "virus2");
-    game.engine.addAnimation("spawnCannonVirus", 10, false, false, "cannonVirus-1", "cannonVirus-2", "cannonVirus-3", "cannonVirus");
-    game.engine.addAnimation("spawnDuplicationVirus", 10, false, false, "duplicationVirus-1", "duplicationVirus-2", "duplicationVirus");
+    game.engine.addAnimation("spawnVirus1", 5, false, false, "virus1-1", "virus1-2", "virus1-3", "virus1");
+    game.engine.addAnimation("spawnVirus2", 5, false, false, "virus2-1", "virus2-2", "virus2-3", "virus2");
+    game.engine.addAnimation("spawnCannonVirus", 5, false, false, "cannonVirus-1", "cannonVirus-2", "cannonVirus-3", "cannonVirus");
+    game.engine.addAnimation("spawnDuplicationVirus", 5, false, false, "duplicationVirus-1", "duplicationVirus-2", "duplicationVirus");
 
     // ---------- Colliders ----------
     this.physics.add.collider(game.viruses, game.viruses);
@@ -265,7 +268,7 @@ class Game extends Phaser.Scene {
     }
 
     // Move cooldown indicator too
-    game.cooldownIndicator.x = game.player.x + 5;
+    game.cooldownIndicator.x = game.player.x - 25;
     game.cooldownIndicator.y = game.player.y - 45;
 
     // Cannon virus action
@@ -343,10 +346,7 @@ class GameOver extends Phaser.Scene {
       game.talk5.stop();
       game.talk6.stop();
       game.talk7.stop();
-      phaser.cameras.main.fadeOut(1000, 0, 0, 0);
-      phaser.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (camera, effect) => {
-        phaser.scene.start(`Cutscene${game.currentRound}`);
-      });
+      phaser.scene.start(`Cutscene${game.currentRound}`);
     });
   }
   update() {
