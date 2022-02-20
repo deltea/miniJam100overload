@@ -116,10 +116,12 @@ class Game extends Phaser.Scene {
         if (game.currentRound === 1) {
           let virus = game.viruses.create(Math.random() * game.engine.gameWidth, Math.random() * game.engine.gameHeight, "virus1").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
           virus.type = "virus1";
+          virus.body.enable = false;
           virus.anims.play("spawnVirus1");
           this.time.addEvent({
             delay: 800,
             callback: () => {
+              virus.body.enable = true;
               virus.setAngularVelocity(250);
               phaser.physics.velocityFromAngle(Math.random() * 360, 200, virus.body.velocity);
             },
@@ -130,10 +132,12 @@ class Game extends Phaser.Scene {
           let virus = game.viruses.create(Math.random() * game.engine.gameWidth, Math.random() * game.engine.gameHeight, "cannonVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1);
           virus.type = "cannonVirus";
           virus.timer = 250;
+          virus.body.enable = false;
           virus.anims.play("spawnCannonVirus");
           this.time.addEvent({
             delay: 800,
             callback: () => {
+              virus.body.enable = true;
               virus.setAngularVelocity(20);
               phaser.physics.velocityFromAngle(Math.random() * 360, 50, virus.body.velocity);
             },
@@ -143,10 +147,12 @@ class Game extends Phaser.Scene {
         } else if (game.currentRound === 3) {
           let virus = game.viruses.create(Math.random() * game.engine.gameWidth, Math.random() * game.engine.gameHeight, "virus2").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
           virus.type = "virus2";
+          virus.body.enable = false;
           virus.anims.play("spawnVirus2");
           this.time.addEvent({
             delay: 800,
             callback: () => {
+              virus.body.enable = true;
               virus.setAngularVelocity(500);
               phaser.physics.velocityFromAngle(Math.random() * 360, 300, virus.body.velocity);
             },
@@ -156,10 +162,12 @@ class Game extends Phaser.Scene {
         } else if (game.currentRound === 4) {
           let virus = game.viruses.create(Math.random() * game.engine.gameWidth, Math.random() * game.engine.gameHeight, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
           virus.type = "duplicationVirus";
+          virus.body.enable = false;
           virus.anims.play("spawnDuplicationVirus");
           this.time.addEvent({
             delay: 800,
             callback: () => {
+              virus.body.enable = true;
               virus.setAngularVelocity(5);
               phaser.physics.velocityFromAngle(Math.random() * 360, 30, virus.body.velocity);
             },
