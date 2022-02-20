@@ -15,9 +15,9 @@ const config = {
         y: 1500
       },
       enableBody: true,
-      debug: true
+      // debug: true
     }
   },
-  scene: [Win, Cutscene1, Cutscene2, Cutscene3, Cutscene4, Round1, Round2, Round3, Round4, GameOver]
+  scene: [Cutscene1, Cutscene2, Cutscene3, Cutscene4, Round1, Round2, Round3, Round4, Win, GameOver]
 };
 const phaserGame = new Phaser.Game(config);

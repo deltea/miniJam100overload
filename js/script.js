@@ -57,7 +57,7 @@ class Game extends Phaser.Scene {
     // Add my own game engine
     game.engine = new Engine(this);
 
-    // Music
+    // "Music"
     game.sfx["talk1"] = this.sound.add("talk1").setLoop(true);
     game.sfx["talk2"] = this.sound.add("talk2").setLoop(true);
     game.sfx["talk3"] = this.sound.add("talk3").setLoop(true);
@@ -113,48 +113,52 @@ class Game extends Phaser.Scene {
 
         // Create virus
         if (game.currentRound === 1) {
-          let virus = game.viruses.create(pointer.x, pointer.y, "virus1").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(250);
+          let virus = game.viruses.create(pointer.x, pointer.y, "virus1").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
           virus.type = "virus1";
           virus.anims.play("spawnVirus1");
           this.time.addEvent({
             delay: 800,
             callback: () => {
+              virus.setAngularVelocity(250);
               phaser.physics.velocityFromAngle(Math.random() * 360, 200, virus.body.velocity);
             },
             callbackScope: this,
             repeat: 0
           });
         } else if (game.currentRound === 2) {
-          let virus = game.viruses.create(pointer.x, pointer.y, "cannonVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(20).setBounce(1);
+          let virus = game.viruses.create(pointer.x, pointer.y, "cannonVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1);
           virus.type = "cannonVirus";
           virus.anims.play("spawnCannonVirus");
           this.time.addEvent({
             delay: 800,
             callback: () => {
+              virus.setAngularVelocity(20);
               phaser.physics.velocityFromAngle(Math.random() * 360, 50, virus.body.velocity);
             },
             callbackScope: this,
             repeat: 0
           });
         } else if (game.currentRound === 3) {
-          let virus = game.viruses.create(pointer.x, pointer.y, "virus2").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(500);
+          let virus = game.viruses.create(pointer.x, pointer.y, "virus2").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500);
           virus.type = "virus2";
           virus.anims.play("spawnVirus2");
           this.time.addEvent({
             delay: 800,
             callback: () => {
+              virus.setAngularVelocity(500);
               phaser.physics.velocityFromAngle(Math.random() * 360, 300, virus.body.velocity);
             },
             callbackScope: this,
             repeat: 0
           });
         } else if (game.currentRound === 4) {
-          let virus = game.viruses.create(pointer.x, pointer.y, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(5).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
+          let virus = game.viruses.create(pointer.x, pointer.y, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
           virus.type = "duplicationVirus";
           virus.anims.play("spawnDuplicationVirus");
           this.time.addEvent({
             delay: 800,
             callback: () => {
+              virus.setAngularVelocity(5);
               phaser.physics.velocityFromAngle(Math.random() * 360, 30, virus.body.velocity);
             },
             callbackScope: this,
@@ -180,11 +184,11 @@ class Game extends Phaser.Scene {
     // Virus actions
     game.virusBullet = this.physics.add.group();
     this.time.addEvent({
-      delay: 5000,
+      delay: 2500,
       callback: () => {
         game.viruses.getChildren().forEach(virus => {
           if (virus.type === "cannonVirus") {
-            let bullet = game.virusBullet.create(virus.x, virus.y, "virusBullet").setScale(8).setGravityY(-1500);
+            let bullet = game.virusBullet.create(virus.x, virus.y, "virusBullet").setScale(8).setGravityY(-1500).setSize(2, 2).setOffset(3, 3);
             this.physics.velocityFromAngle(virus.angle, 500, bullet.body.velocity);
           } else if (virus.type === "duplicationVirus") {
             virus = game.viruses.create(virus.x, virus.y, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(5).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
@@ -274,13 +278,51 @@ class GameOver extends Phaser.Scene {
     super("GameOver");
   }
   preload() {
-
+    this.load.image("chaos", "assets/chaos.png");
+    this.load.image("news1", "assets/news1.jpg");
+    this.load.image("news2", "assets/news2.jpg");
+    this.load.audio("talk1", "assets/talk1.wav");
+    this.load.audio("talk2", "assets/talk2.wav");
+    this.load.audio("talk3", "assets/talk3.wav");
+    this.load.audio("talk4", "assets/talk4.wav");
+    this.load.audio("talk5", "assets/talk5.wav");
+    this.load.audio("talk6", "assets/talk6.wav");
+    this.load.audio("talk7", "assets/talk7.wav");
   }
   create() {
-    this.cameras.main.backgroundColor.setTo(255, 255, 255);
+    let phaser = this;
+    // Sound
+    this.sound.add("talk1").setLoop(true).play({rate: 2});
+    this.sound.add("talk2").setLoop(true).play({rate: 2});
+    this.sound.add("talk3").setLoop(true).play({rate: 2});
+    this.sound.add("talk4").setLoop(true).play({rate: 2});
+    this.sound.add("talk5").setLoop(true).play({rate: 2});
+    this.sound.add("talk6").setLoop(true).play({rate: 2});
+    this.sound.add("talk7").setLoop(true).play({rate: 2});
+
+    // Scrolling background
+    game.gameOverBackground1 = this.add.tileSprite(0, 0, game.engine.gameWidth, game.engine.gameHeight, "news1").setOrigin(0);
+    game.gameOverBackground2 = this.add.tileSprite(0, 0, game.engine.gameWidth / 2, game.engine.gameHeight, "news2").setOrigin(0);
+
+    // Text
+    game.chaosText = this.add.image(game.engine.gameWidth / 2, game.engine.gameHeight / 2, "chaos").setScale(8);
+    this.tweens.add({
+      targets: game.chaosText,
+      scaleX: 16,
+      scaleY: 16,
+      duration: 500,
+      repeat: -1,
+      yoyo: true
+    });
+    this.input.on("pointerdown", function () {
+      phaser.scene.start(`Cutscene${game.currentRound}`);
+    });
   }
   update() {
-
+    game.gameOverBackground1.tilePositionY += 50;
+    game.gameOverBackground2.tilePositionY += 50;
+    game.gameOverBackground1.tilePositionX += 50;
+    game.gameOverBackground2.tilePositionX += 50;
   }
 }
 
