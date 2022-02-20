@@ -1,15 +1,32 @@
 let game = {
   virusAmount: 0,
   currentRound: 1,
-  virusCooldown: 0
+  virusCooldown: 0,
+  sfx: {}
 };
 class Game extends Phaser.Scene {
   constructor(key) {
     super(key);
   }
   preload() {
-    this.load.image("player", "assets/player.png");
-    this.load.image("virus", "assets/virus.png");
+    this.load.image("player", "assets/guy.png");
+    this.load.image("virus1", "assets/virus1.png");
+    this.load.image("virus1-1", "assets/virus1-1.png");
+    this.load.image("virus1-2", "assets/virus1-2.png");
+    this.load.image("virus1-3", "assets/virus1-3.png");
+    this.load.image("virus2", "assets/virus2.png");
+    this.load.image("virus2-1", "assets/virus2-1.png");
+    this.load.image("virus2-2", "assets/virus2-2.png");
+    this.load.image("virus2-3", "assets/virus2-3.png");
+    this.load.image("cannonVirus", "assets/cannonVirus.png");
+    this.load.image("cannonVirus-1", "assets/cannonVirus-1.png");
+    this.load.image("cannonVirus-2", "assets/cannonVirus-2.png");
+    this.load.image("cannonVirus-3", "assets/cannonVirus-3.png");
+    this.load.image("cannonVirusShoot", "assets/cannonVirusShoot.png");
+    this.load.image("virusBullet", "assets/virusBullet.png");
+    this.load.image("duplicationVirus", "assets/duplicationVirus.png");
+    this.load.image("duplicationVirus-1", "assets/duplicationVirus-1.png");
+    this.load.image("duplicationVirus-2", "assets/duplicationVirus-2.png");
     this.load.image("0", "assets/0.png");
     this.load.image("1", "assets/1.png");
     this.load.image("2", "assets/2.png");
@@ -20,30 +37,68 @@ class Game extends Phaser.Scene {
     this.load.image("7", "assets/7.png");
     this.load.image("8", "assets/8.png");
     this.load.image("9", "assets/9.png");
+    this.load.image("news1", "assets/news1.jpg");
+    this.load.image("news2", "assets/news2.jpg");
+    this.load.audio("talk1", "assets/talk1.wav");
+    this.load.audio("talk2", "assets/talk2.wav");
+    this.load.audio("talk3", "assets/talk3.wav");
+    this.load.audio("talk4", "assets/talk4.wav");
+    this.load.audio("talk5", "assets/talk5.wav");
+    this.load.audio("talk6", "assets/talk6.wav");
+    this.load.audio("talk7", "assets/talk7.wav");
   }
   create() {
     let phaser = this;
     game.virusAmount = 0;
+    game.virusCooldown = 0;
+    game.scrollAmount = 0;
+    game.scrollFactor = 0;
 
     // Add my own game engine
     game.engine = new Engine(this);
 
-    // Create player
-    game.player = this.physics.add.sprite(game.engine.gameWidth / 2, game.engine.gameHeight / 2, "player").setGravityY(-1500).setScale(8).setDrag(1500).setCollideWorldBounds(true).setSize(6, 5).setOffset(1, 2).setImmovable(true);
+    // Music
+    game.sfx["talk1"] = this.sound.add("talk1").setLoop(true);
+    game.sfx["talk2"] = this.sound.add("talk2").setLoop(true);
+    game.sfx["talk3"] = this.sound.add("talk3").setLoop(true);
+    game.sfx["talk4"] = this.sound.add("talk4").setLoop(true);
+    game.sfx["talk5"] = this.sound.add("talk5").setLoop(true);
+    game.sfx["talk6"] = this.sound.add("talk6").setLoop(true);
+    game.sfx["talk7"] = this.sound.add("talk7").setLoop(true);
 
-    // Shoot viruses
+    // Scrolling background
+    game.background1 = this.add.tileSprite(0, 0, game.engine.gameWidth, game.engine.gameHeight, "news1").setOrigin(0);
+    game.background2 = this.add.tileSprite(0, 0, game.engine.gameWidth / 2, game.engine.gameHeight, "news2").setOrigin(0);
+
+    // Create player
+    game.player = this.physics.add.sprite(game.engine.gameWidth / 2, game.engine.gameHeight / 2, "player").setGravityY(-1500).setScale(8).setDrag(1500).setCollideWorldBounds(true).setSize(5, 8).setOffset(2, 0).setImmovable(true);
+
+    // Spawn viruses
     game.viruses = this.physics.add.group();
     this.input.on("pointerdown", (pointer) => {
       if (game.virusCooldown <= 0) {
         // Reset cooldown
         game.virusCooldown = 300;
+        game.cooldownIndicator.width = 0;
 
         // Update virus amount
         if (game.virusAmount >= 10) {
-          this.scene.start(`Round${game.currentRound + 1}`);
+          game.sfx["talk1"].stop();
+          game.sfx["talk2"].stop();
+          game.sfx["talk3"].stop();
+          game.sfx["talk4"].stop();
+          game.sfx["talk5"].stop();
+          game.sfx["talk6"].stop();
+          game.sfx["talk7"].stop();
+          this.scene.start(`Cutscene${game.currentRound + 1}`);
           game.currentRound++;
         }
         game.virusAmount++;
+        game.scrollAmount = 0.5 * 1.3 ** game.scrollFactor;
+        game.scrollFactor += 1;
+        if (game.virusAmount <= 7) {
+          game.sfx[`talk${game.virusAmount}`].play({volume: game.virusAmount === 1 ? 20 : 0.8});
+        }
         let numberArray = String(game.virusAmount).split("");
         for (var i = 0; i < game.virusAmountNumbers.getChildren().length; i++) {
           game.virusAmountNumbers.getChildren()[i].visible = false;
@@ -53,8 +108,55 @@ class Game extends Phaser.Scene {
         }
 
         // Create virus
-        let virus = game.viruses.create(pointer.x, pointer.y, "virus").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(250);
-        this.physics.velocityFromAngle(Math.random() * 360, 200, virus.body.velocity);
+        if (game.currentRound === 1) {
+          let virus = game.viruses.create(pointer.x, pointer.y, "virus1").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(250);
+          virus.type = "virus1";
+          virus.anims.play("spawnVirus1");
+          this.time.addEvent({
+            delay: 800,
+            callback: () => {
+              phaser.physics.velocityFromAngle(Math.random() * 360, 200, virus.body.velocity);
+            },
+            callbackScope: this,
+            repeat: 0
+          });
+        } else if (game.currentRound === 2) {
+          let virus = game.viruses.create(pointer.x, pointer.y, "cannonVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(20).setBounce(1);
+          virus.type = "cannonVirus";
+          virus.anims.play("spawnCannonVirus");
+          this.time.addEvent({
+            delay: 800,
+            callback: () => {
+              phaser.physics.velocityFromAngle(Math.random() * 360, 50, virus.body.velocity);
+            },
+            callbackScope: this,
+            repeat: 0
+          });
+        } else if (game.currentRound === 3) {
+          let virus = game.viruses.create(pointer.x, pointer.y, "virus2").setBounce(1).setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(500);
+          virus.type = "virus2";
+          virus.anims.play("spawnVirus2");
+          this.time.addEvent({
+            delay: 800,
+            callback: () => {
+              phaser.physics.velocityFromAngle(Math.random() * 360, 300, virus.body.velocity);
+            },
+            callbackScope: this,
+            repeat: 0
+          });
+        } else if (game.currentRound === 4) {
+          let virus = game.viruses.create(pointer.x, pointer.y, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(5).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
+          virus.type = "duplicationVirus";
+          virus.anims.play("spawnDuplicationVirus");
+          this.time.addEvent({
+            delay: 800,
+            callback: () => {
+              phaser.physics.velocityFromAngle(Math.random() * 360, 30, virus.body.velocity);
+            },
+            callbackScope: this,
+            repeat: 0
+          });
+        }
       }
     });
 
@@ -64,7 +166,31 @@ class Game extends Phaser.Scene {
       callback: () => {
         if (game.virusCooldown > 0) {
           game.virusCooldown--;
+          game.cooldownIndicator.width += 0.16;
         }
+      },
+      callbackScope: this,
+      repeat: -1
+    });
+
+    // Virus actions
+    game.virusBullet = this.physics.add.group();
+    this.time.addEvent({
+      delay: 5000,
+      callback: () => {
+        game.viruses.getChildren().forEach(virus => {
+          if (virus.type === "cannonVirus") {
+            let bullet = game.virusBullet.create(virus.x, virus.y, "virusBullet").setScale(8).setGravityY(-1500);
+            this.physics.velocityFromAngle(virus.angle, 500, bullet.body.velocity);
+          } else if (virus.type === "duplicationVirus") {
+            virus = game.viruses.create(virus.x, virus.y, "duplicationVirus").setCollideWorldBounds(true).setScale(8).setGravityY(-1500).setAngularVelocity(5).setBounce(1).setSize(4, 3).setOffset(0, 0).setOrigin(0.25);
+            virus.anims.play("spawnDuplicationVirus");
+            virus.type = "duplicationVirus";
+            setTimeout(function () {
+              phaser.physics.velocityFromAngle(Math.random() * 360, 25, virus.body.velocity);
+            }, 800);
+          }
+        });
       },
       callbackScope: this,
       repeat: -1
@@ -77,9 +203,35 @@ class Game extends Phaser.Scene {
       game.virusAmountNumbers.create((i * 40) + 40, 50, numberArray[i]).setScale(8).setScrollFactor(0);
     }
 
+    // Show virus cooldown
+    game.cooldownIndicator = this.add.rectangle(game.player.x + 5, game.player.y - 45, 50, 10, 0xff1100);
+
+    // ---------- Some animation ----------
+    game.engine.addAnimation("spawnVirus1", 10, false, false, "virus1-1", "virus1-2", "virus1-3", "virus1");
+    game.engine.addAnimation("spawnVirus2", 10, false, false, "virus2-1", "virus2-2", "virus2-3", "virus2");
+    game.engine.addAnimation("spawnCannonVirus", 10, false, false, "cannonVirus-1", "cannonVirus-2", "cannonVirus-3", "cannonVirus");
+    game.engine.addAnimation("spawnDuplicationVirus", 10, false, false, "duplicationVirus-1", "duplicationVirus-2", "duplicationVirus");
+
     // ---------- Colliders ----------
     this.physics.add.collider(game.viruses, game.viruses);
     this.physics.add.collider(game.player, game.viruses, () => {
+      game.sfx["talk1"].stop();
+      game.sfx["talk2"].stop();
+      game.sfx["talk3"].stop();
+      game.sfx["talk4"].stop();
+      game.sfx["talk5"].stop();
+      game.sfx["talk6"].stop();
+      game.sfx["talk7"].stop();
+      phaser.scene.start("GameOver");
+    });
+    this.physics.add.collider(game.virusBullet, game.player, () => {
+      game.sfx["talk1"].stop();
+      game.sfx["talk2"].stop();
+      game.sfx["talk3"].stop();
+      game.sfx["talk4"].stop();
+      game.sfx["talk5"].stop();
+      game.sfx["talk6"].stop();
+      game.sfx["talk7"].stop();
       phaser.scene.start("GameOver");
     });
   }
@@ -87,16 +239,28 @@ class Game extends Phaser.Scene {
     // Player movement
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A).isDown) {
       game.player.setVelocityX(-300);
+      game.background1.tilePositionY += game.scrollAmount;
+      game.background2.tilePositionY += game.scrollAmount;
     }
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D).isDown) {
       game.player.setVelocityX(300);
+      game.background1.tilePositionY -= game.scrollAmount;
+      game.background2.tilePositionY -= game.scrollAmount;
     }
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S).isDown) {
       game.player.setVelocityY(300);
+      game.background1.tilePositionX += game.scrollAmount;
+      game.background2.tilePositionX += game.scrollAmount;
     }
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).isDown) {
       game.player.setVelocityY(-300);
+      game.background1.tilePositionX -= game.scrollAmount;
+      game.background2.tilePositionX -= game.scrollAmount;
     }
+
+    // Move cooldown indicator too
+    game.cooldownIndicator.x = game.player.x + 5;
+    game.cooldownIndicator.y = game.player.y - 45;
   }
 }
 
@@ -135,5 +299,28 @@ class Round3 extends Game {
 class Round4 extends Game {
   constructor() {
     super("Round4");
+  }
+}
+
+// ---------- Cutscenes ----------
+
+class Cutscene1 extends Cutscene {
+  constructor() {
+    super("Cutscene1", "assets/guy.png", "assets/virus1.png", "assets/vs.png", "Round1");
+  }
+}
+class Cutscene2 extends Cutscene {
+  constructor() {
+    super("Cutscene2", "assets/guy.png", "assets/cannonVirus.png", "assets/vs.png", "Round2");
+  }
+}
+class Cutscene3 extends Cutscene {
+  constructor() {
+    super("Cutscene3", "assets/guy.png", "assets/virus2.png", "assets/vs.png", "Round3");
+  }
+}
+class Cutscene4 extends Cutscene {
+  constructor() {
+    super("Cutscene4", "assets/guy.png", "assets/duplicationVirus.png", "assets/vs.png", "Round4");
   }
 }

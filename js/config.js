@@ -18,6 +18,6 @@ const config = {
       // debug: true
     }
   },
-  scene: [Round1, Round2, Round3, Round4, GameOver]
+  scene: [Cutscene1, Cutscene2, Cutscene3, Cutscene4, Round1, Round2, Round3, Round4, GameOver]
 };
 const phaserGame = new Phaser.Game(config);
